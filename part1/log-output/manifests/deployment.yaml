@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hashgenerator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hashgenerator
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: hashgenerator
+    spec:
+      containers:
+      - image: melxi/hashgenerator
+        name: hashgenerator
