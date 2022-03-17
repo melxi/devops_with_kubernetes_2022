@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: project-svc
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: project
   ports:
@@ -11,4 +11,3 @@ spec:
       protocol: TCP
       port: 8080
       targetPort: 3000
-      nodePort: 30080
