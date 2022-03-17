@@ -14,5 +14,5 @@ spec:
         app: hashgenerator
     spec:
       containers:
-      - image: melxi/hashgenerator
+      - image: melxi/hashgenerator:0.1
         name: hashgenerator

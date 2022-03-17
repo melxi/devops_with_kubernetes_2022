@@ -1,12 +1,12 @@
-const uuid = require('uuid')
+const express = require('express')
+const output = require('./hashgenerator.js')
+const app = express()
+const port = process.env.PORT | 3001
 
-const generateHash = () => {
-  const randomHash = uuid.v4()
-  const date = new Date().toISOString()
+app.get('/', (req, res) => {
+  res.send(output[output.length - 1])
+})
 
-  console.log(`${date}: ${randomHash}`)
-
-  setTimeout(generateHash, 5000)
-}
-
-generateHash()
+app.listen(port, () => {
+  `Server started in port ${port}`
+})
