@@ -1,18 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hashgenerator
+  name: log-output
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: hashgenerator
+      app: log-output
   strategy: {}
   template:
     metadata:
       labels:
-        app: hashgenerator
+        app: log-output
     spec:
+      volumes:
+        - name: timestamp-logs
+          emptyDir: {}
       containers:
-      - image: melxi/hashgenerator:0.1
+      - image: melxi/hashgenerator
         name: hashgenerator
+        volumeMounts:
+        - name: timestamp-logs
+          mountPath: /usr/src/app/logs
+      - image: melxi/timestamper
+        name: timestamper
+        volumeMounts:
+        - name: timestamp-logs
+          mountPath: /usr/src/app/logs

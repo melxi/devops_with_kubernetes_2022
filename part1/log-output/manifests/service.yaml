@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: hashgenerator-svc
+  name: log-output-svc
 spec:
   type: ClusterIP
   selector:
-    app: hashgenerator
+    app: log-output
   ports:
     - name: http
       protocol: TCP
