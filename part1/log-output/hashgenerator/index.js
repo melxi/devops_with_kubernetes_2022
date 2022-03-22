@@ -8,16 +8,17 @@ const app = express()
 const port = process.env.PORT || 3001
 
 const dir = path.join('/', 'usr', 'src', 'app', 'logs')
-const filePath = path.join(dir, "timestamps.log")
 
-const getLastTimestamp = async () => {
-  const readStream = fs.createReadStream(filePath);
+const getLastLine = async (filePath) => {
+  filePath = path.join(dir, filePath)
+  const readStream = fs.createReadStream(filePath)
   const writeStream = new Stream
+  
   return new Promise((resolve, reject)=> {
     let lastLine = ''
-    const rl = readline.createInterface(readStream, writeStream);
+    const rl = readline.createInterface(readStream, writeStream)
 
-    rl.on('line', function (line) {
+    rl.on('line', line => {
       if (line.length >= 0) {
         lastLine = line
       }
@@ -25,7 +26,7 @@ const getLastTimestamp = async () => {
 
     rl.on('error', reject)
 
-    rl.on('close', function () {
+    rl.on('close', () => {
       resolve(lastLine)
     })
   })
@@ -34,12 +35,14 @@ const getLastTimestamp = async () => {
 app.get('/', async (req, res) => {
   let result = 'Nothing to output!'
   const randomHash = uuid.v4()
-  const timestamp = await getLastTimestamp()
+  const timestamp = await getLastLine("timestamps.log")
+  const counter = await getLastLine("counter.log")
 
   if (!timestamp) {
     res.send(result)
   } else {
-    result = `${timestamp}: ${randomHash}`
+    result = `${timestamp}: ${randomHash} \n` + 
+             `Ping / Pongs: ${counter ? counter : 0}`
     
     res.send(result)
   }

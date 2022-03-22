@@ -14,16 +14,17 @@ spec:
         app: log-output
     spec:
       volumes:
-        - name: timestamp-logs
-          emptyDir: {}
+      - name: shared-logs
+        persistentVolumeClaim:
+          claimName: logs-claim
       containers:
       - image: melxi/hashgenerator
         name: hashgenerator
         volumeMounts:
-        - name: timestamp-logs
+        - name: shared-logs
           mountPath: /usr/src/app/logs
       - image: melxi/timestamper
         name: timestamper
         volumeMounts:
-        - name: timestamp-logs
+        - name: shared-logs
           mountPath: /usr/src/app/logs
