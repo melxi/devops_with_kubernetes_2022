@@ -19,3 +19,7 @@ body {
   margin: auto;
   margin-bottom: 3rem;
 }
+
+.random-image {
+  width: 480px;
+}
