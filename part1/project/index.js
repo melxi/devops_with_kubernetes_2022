@@ -6,6 +6,27 @@ const axios = require('axios')
 const app = express()
 const port = process.env.PORT || 3000
 
+const todos = [
+  {
+    "userId": 1,
+    "id": 1,
+    "title": "delectus aut autem",
+    "completed": false
+  },
+  {
+    "userId": 1,
+    "id": 2,
+    "title": "quis ut nam facilis et officia qui",
+    "completed": false
+  },
+  {
+    "userId": 1,
+    "id": 3,
+    "title": "fugiat veniam minus",
+    "completed": false
+  }
+]
+
 app.set('trust proxy', 1)
 
 // Serve static assets
@@ -59,7 +80,9 @@ app.use(async (req, res, next) => {
 })
 
 app.get('/', (req, res) => {
-  res.render("index")
+  res.render("index", {
+    todos: todos
+  })
 })
 
 app.listen(port, () => {
