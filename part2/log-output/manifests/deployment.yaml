@@ -16,5 +16,11 @@ spec:
       containers:
       - image: melxi/hashgenerator
         name: hashgenerator
+        env:
+          - name: GREETING
+            valueFrom:
+              configMapKeyRef:
+                name: greeting-configmap
+                key: greeting
       - image: melxi/timestamper
         name: timestamper

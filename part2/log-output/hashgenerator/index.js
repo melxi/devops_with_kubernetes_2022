@@ -3,6 +3,7 @@ const axios = require('axios')
 const uuid = require('uuid')
 const app = express()
 const port = process.env.PORT || 3001
+const greeting = process.env.GREETING || 'Tervehdys'
 
 app.get('/', async (req, res) => {
   const randomHash = uuid.v4()
@@ -14,7 +15,7 @@ app.get('/', async (req, res) => {
                              .then(res => res.data)
                              .catch(err => err)
 
-  const result = `${timestamp}: ${randomHash} \n${counter}`
+  const result = `${greeting} \n${timestamp}: ${randomHash} \n${counter}`
     
   res.send(result)
 })
