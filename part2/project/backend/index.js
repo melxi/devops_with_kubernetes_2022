@@ -1,42 +1,41 @@
 const express = require('express')
+const { Client } = require('pg')
 const axios = require('axios')
 const app = express()
 const port = process.env.PORT || 3001
+const { 
+  POSTGRES_DB,
+  POSTGRES_HOST,
+  POSTGRES_PORT,
+  POSTGRES_USER,
+  POSTGRES_PASSWORD
+} = process.env
 
-const todos = [
-  {
-    "id": 1,
-    "title": "delectus aut autem",
-    "completed": false
-  },
-  {
-    "id": 2,
-    "title": "quis ut nam facilis",
-    "completed": false
-  },
-  {
-    "id": 3,
-    "title": "fugiat veniam minus",
-    "completed": false
-  }
-]
+const client = new Client({
+  user: POSTGRES_USER,
+  host: POSTGRES_HOST,
+  database: POSTGRES_DB,
+  password: POSTGRES_PASSWORD,
+  port: POSTGRES_PORT
+})
 
 app.use(express.json())
 
-app.get('/todos', (req, res) => {
-  res.json(todos)
+client.connect()
+
+client.query('CREATE TABLE IF NOT EXISTS todos (id SERIAL PRIMARY KEY, title TEXT NOT NULL, completed BOOLEAN)')
+
+app.get('/todos', async (req, res) => {
+  const { rows } = await client.query('SELECT * FROM todos')
+  res.json(rows)
 })
 
-app.post('/todos', (req, res) => {
+app.post('/todos', async (req, res) => {
   const { title } = req.body
-  const todo = {
-    id: todos.length + 1,
-    title: title,
-    completed: false
-  }
+
+  await client.query('INSERT INTO todos (title, completed) VALUES($1, $2);', [title, false])
   
-  todos.push(todo)
-  res.json(todo)
+  res.json({ message: 'Todo added' })
 })
 
 app.listen(port, () => {

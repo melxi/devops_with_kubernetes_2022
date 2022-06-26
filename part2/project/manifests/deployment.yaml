@@ -28,3 +28,9 @@ spec:
       - image: melxi/project:backend
         imagePullPolicy: Always
         name: backend
+        envFrom:
+          - configMapRef:
+              name: project-configmap
+          - secretRef:
+              name: project-password
+

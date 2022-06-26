@@ -1,5 +1,5 @@
 const express = require('express')
-const { Pool, Client } = require('pg')
+const { Client } = require('pg')
 const app = express()
 const port = process.env.PORT || 3002
 const { 
@@ -9,12 +9,6 @@ const {
   POSTGRES_USER,
   POSTGRES_PASSWORD
 } = process.env
-
-console.log(POSTGRES_DB,
-  POSTGRES_HOST,
-  POSTGRES_PORT,
-  POSTGRES_USER,
-  POSTGRES_PASSWORD);
 
 const client = new Client({
   user: POSTGRES_USER,
