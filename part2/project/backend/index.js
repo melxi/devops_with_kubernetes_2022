@@ -1,5 +1,6 @@
 const express = require('express')
 const { Client } = require('pg')
+const morgan = require('morgan')
 const axios = require('axios')
 const app = express()
 const port = process.env.PORT || 3001
@@ -20,6 +21,7 @@ const client = new Client({
 })
 
 app.use(express.json())
+app.use(morgan('common'))
 
 client.connect()
 
@@ -33,9 +35,13 @@ app.get('/todos', async (req, res) => {
 app.post('/todos', async (req, res) => {
   const { title } = req.body
 
-  await client.query('INSERT INTO todos (title, completed) VALUES($1, $2);', [title, false])
-  
-  res.json({ message: 'Todo added' })
+  if (title.length > 140) {
+    res.json({ message: 'Todo is too long!' })
+  } else {
+    await client.query('INSERT INTO todos (title, completed) VALUES($1, $2);', [title, false])
+
+    res.json({ message: 'Todo added' })
+  }
 })
 
 app.listen(port, () => {

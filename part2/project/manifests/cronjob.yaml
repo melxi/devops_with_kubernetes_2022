@@ -16,6 +16,6 @@ spec:
             command:
             - /bin/sh
             - -c
-            - "curl -d '{\"title\":\"Read '$(curl -w '%{url_effective}' -I -L -s -S https://en.wikipedia.org/wiki/Special:Random -o /dev/null)'\", \"completed\":\"false\"}' 
+            - "curl -d '{\"title\":\"Read '$(curl -w '%{url_effective}' -I -L -s -S https://en.wikipedia.org/wiki/Special:Random -o /dev/null)'\"}' 
             -H \"Content-Type: application/json\" -X POST http://project-svc.project:8081/todos"
           restartPolicy: OnFailure
