@@ -30,6 +30,10 @@ client.query('SELECT EXISTS(SELECT count FROM pingpong)', (err, res) => {
   }
 })
 
+app.get("/", (req, res) => {
+  res.send("Hello, World!")
+})
+
 app.get("/pingpong", async (req, res) => {
   let counter;
   const { rows } = await client.query('SELECT count FROM pingpong WHERE id=$1', ['pingpongs'])
