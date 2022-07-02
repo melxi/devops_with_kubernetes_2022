@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pingpong
+  namespace: applications
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pingpong
+  template:
+    metadata:
+      labels:
+        app: pingpong
+    spec:
+      containers:
+      - image: melxi/pingpong
+        name: pingpong
+        envFrom:
+          - configMapRef:
+              name: pingpong-configmap
+          - secretRef:
+              name: pingpong-password
