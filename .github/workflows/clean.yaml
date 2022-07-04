@@ -1,0 +1,32 @@
+name: Clean resources from GKE
+
+on:
+  delete:
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north1-b
+
+jobs:
+  clean-resources:
+    name: Clean resources
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    # Set up Google Cloud SDK
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@main
+      with:
+        project_id: ${{ secrets.GKE_PROJECT }}
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        export_default_credentials: true
+    # Get the GKE credentials so we can deploy to the cluster
+    - name: Authenticating to cluster
+    - run: |-
+        gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+    # Deploy the Docker image to the GKE cluster
+    - name: Delete namespace
+      run: |-
+        kubectl delete namespaces ${{ github.event.ref }}
