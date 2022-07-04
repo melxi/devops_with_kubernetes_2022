@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: project-svc
+  namespace: project
+spec:
+  type: ClusterIP
+  selector:
+    app: project
+  ports:
+    - name: frontend
+      protocol: TCP
+      port: 8080
+      targetPort: 3000
+    - name: backend
+      protocol: TCP
+      port: 8081
+      targetPort: 3001
