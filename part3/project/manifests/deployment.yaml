@@ -19,13 +19,13 @@ spec:
           persistentVolumeClaim:
             claimName: project-claim
       containers:
-      - image: melxi/project:frontend
+      - image: frontend
         imagePullPolicy: Always
         name: frontend
         volumeMounts:
         - name: project-cache
           mountPath: /usr/src/app/public/img
-      - image: melxi/project:backend
+      - image: backend
         imagePullPolicy: Always
         name: backend
         envFrom:
@@ -33,4 +33,3 @@ spec:
               name: project-configmap
           - secretRef:
               name: project-password
-
