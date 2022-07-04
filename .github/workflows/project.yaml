@@ -2,8 +2,6 @@ name: Build and Deploy project to GKE
 
 on:
   push:
-    branches: 
-      - part3
     paths:
       - 'part3/project/**'
       - '.github/workflows/project.yaml'
@@ -13,7 +11,6 @@ env:
   GKE_CLUSTER: dwk-cluster
   GKE_ZONE: europe-north1-b
   IMAGE: project
-  NAMESPACE: project
 
 jobs:
   setup-build-publish-deploy:
@@ -71,6 +68,9 @@ jobs:
     - name: Deploy
       run: |-
         cd ./part3/project
+        kubectl create namespace ${GITHUB_REF#refs/heads/} || true
+        kubectl config set-context --current --namespace=${GITHUB_REF#refs/heads/}
+        kustomize edit set namespace ${GITHUB_REF#refs/heads/}
         kustomize edit set image frontend:TAG=gcr.io/$PROJECT_ID/$IMAGE:frontend-${GITHUB_REF#refs/heads/}-$GITHUB_SHA \
         backend:TAG=gcr.io/$PROJECT_ID/$IMAGE:backend-${GITHUB_REF#refs/heads/}-$GITHUB_SHA
         cat <<EOF | kubectl apply -f -
@@ -78,10 +78,10 @@ jobs:
           kind: Secret
           metadata:
             name: project-password
-            namespace: project
+            namespace: ${GITHUB_REF#refs/heads/}
           data:
             POSTGRES_PASSWORD: ${{ steps.sops.outputs.secret }}
         EOF
         kustomize build . | kubectl apply -f -
-        kubectl rollout status deployment/$IMAGE --namespace $NAMESPACE
-        kubectl get services -o wide --namespace $NAMESPACE
+        kubectl rollout status deployment/$IMAGE --namespace ${GITHUB_REF#refs/heads/}
+        kubectl get services -o wide --namespace ${GITHUB_REF#refs/heads/}
