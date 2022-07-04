@@ -1,0 +1,87 @@
+name: Build and Deploy project to GKE
+
+on:
+  push:
+    branches: 
+      - part3
+    paths:
+      - 'part3/project/**'
+      - '.github/workflows/project.yaml'
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north1-b
+  IMAGE: project
+  NAMESPACE: project
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    # Set up Google Cloud SDK
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@main
+      with:
+        project_id: ${{ secrets.GKE_PROJECT }}
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        export_default_credentials: true
+    # Configure Docker to use the gcloud command-line tool as a credential helper for authentication
+    - run: |-
+        gcloud --quiet auth configure-docker
+    # Get the GKE credentials so we can deploy to the cluster
+    - run: |-
+        gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+    # Build the Docker image
+    - name: Build
+      run: |-
+        cd ./part3/project/frontend && docker build \
+          --tag "gcr.io/$PROJECT_ID/$IMAGE:frontend-${GITHUB_REF#refs/heads/}-$GITHUB_SHA" \
+          .
+    # Push the Docker image to Google Container Registry
+    - name: Publish
+      run: |-
+        docker push "gcr.io/$PROJECT_ID/$IMAGE:frontend-${GITHUB_REF#refs/heads/}-$GITHUB_SHA"
+    # Build the Docker image
+    - name: Build
+      run: |-
+        cd ./part3/project/backend && docker build \
+          --tag "gcr.io/$PROJECT_ID/$IMAGE:backend-${GITHUB_REF#refs/heads/}-$GITHUB_SHA" \
+          .
+    # Push the Docker image to Google Container Registry
+    - name: Publish
+      run: |-
+        docker push "gcr.io/$PROJECT_ID/$IMAGE:backend-${GITHUB_REF#refs/heads/}-$GITHUB_SHA"
+    # Set up kustomize
+    - name: Set up Kustomize
+      uses: imranismail/setup-kustomize@v1
+    # Set up SOPS and decrypt secret
+    - name: Sops Binary Installer
+      uses: mildronize/actions-get-secret-sops@v1
+      id: sops
+      with:
+        path: "part3/project/manifests/secret.enc.yaml" # Encrypted SOPS yaml path
+        property-path: ".data.POSTGRES_PASSWORD" # yq/jq expression syntax for getting a particular value
+        decrypting-key: ${{ secrets.SOPS_AGE_KEY_FILE }} # Age Secret Key
+        sops-version: '3.7.3'
+    # Deploy the Docker image to the GKE cluster
+    - name: Deploy
+      run: |-
+        cd ./part3/project
+        kustomize edit set image frontend:TAG=gcr.io/$PROJECT_ID/$IMAGE:frontend-${GITHUB_REF#refs/heads/}-$GITHUB_SHA \
+        backend:TAG=gcr.io/$PROJECT_ID/$IMAGE:backend-${GITHUB_REF#refs/heads/}-$GITHUB_SHA
+        cat <<EOF | kubectl apply -f -
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: project-password
+            namespace: project
+          data:
+            POSTGRES_PASSWORD: ${{ steps.sops.outputs.secret }}
+        EOF
+        kustomize build . | kubectl apply -f -
+        kubectl rollout status deployment/$IMAGE --namespace $NAMEPSACE
+        kubectl get services -o wide --namespace $NAMEPSACE

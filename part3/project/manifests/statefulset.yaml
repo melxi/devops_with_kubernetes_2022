@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres
-  namespace: applications
+  namespace: project
 spec:
   serviceName: postgres-svc
   replicas: 1
@@ -19,18 +19,18 @@ spec:
           image: postgres
           envFrom:
           - configMapRef:
-              name: pingpong-configmap
+              name: project-configmap
           - secretRef:
-              name: pingpong-password
+              name: project-password
           volumeMounts:
             - name: data
               mountPath: /data
   volumeClaimTemplates:
     - metadata:
         name: data
+        namespace: project
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: local-path
         resources:
           requests:
             storage: 100Mi
