@@ -83,5 +83,5 @@ jobs:
             POSTGRES_PASSWORD: ${{ steps.sops.outputs.secret }}
         EOF
         kustomize build . | kubectl apply -f -
-        kubectl rollout status deployment/$IMAGE --namespace $NAMEPSACE
-        kubectl get services -o wide --namespace $NAMEPSACE
+        kubectl rollout status deployment/$IMAGE --namespace $NAMESPACE
+        kubectl get services -o wide --namespace $NAMESPACE
