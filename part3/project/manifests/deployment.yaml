@@ -33,3 +33,9 @@ spec:
               name: project-configmap
           - secretRef:
               name: project-password
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: "500m"
+            memory: "1000Mi"
