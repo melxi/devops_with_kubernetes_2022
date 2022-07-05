@@ -23,3 +23,8 @@ DevOps with Kubernetes is an introduction to Kubernetes with K3s and GKE.
 - High maintenance
 - Limited scalability
 - Manual backups
+
+# Exercise 3.07: Commitment
+
+We have chosen to use Postgres with PersistentVolumeClaim in the project since it was already in use
+in previous parts of this course
