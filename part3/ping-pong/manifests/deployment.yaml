@@ -21,3 +21,9 @@ spec:
               name: pingpong-configmap
           - secretRef:
               name: pingpong-password
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: "250m"
+            memory: "500Mi"

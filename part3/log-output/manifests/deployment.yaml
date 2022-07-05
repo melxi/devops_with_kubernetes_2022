@@ -24,3 +24,9 @@ spec:
                 key: greeting
       - image: melxi/timestamper
         name: timestamper
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: "250m"
+            memory: "500Mi"
