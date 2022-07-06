@@ -28,3 +28,7 @@ DevOps with Kubernetes is an introduction to Kubernetes with K3s and GKE.
 
 We have chosen to use Postgres with PersistentVolumeClaim in the project since it was already in use
 in previous parts of this course
+
+# Exercise 3.10: Project v1.6
+
+![logs](logs.png)
