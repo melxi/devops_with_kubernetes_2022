@@ -24,7 +24,7 @@ jobs:
         export_default_credentials: true
     # Get the GKE credentials so we can deploy to the cluster
     - name: Authenticating to cluster
-    - run: |-
+      run: |-
         gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
     # Deploy the Docker image to the GKE cluster
     - name: Delete namespace
