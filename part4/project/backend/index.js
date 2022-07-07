@@ -27,6 +27,20 @@ client.connect()
 
 client.query('CREATE TABLE IF NOT EXISTS todos (id SERIAL PRIMARY KEY, title TEXT NOT NULL, completed BOOLEAN)')
 
+app.get('/healthz', async (req, res) => {
+  try {
+    await client.query('SELECT $1::text as status', ['ACK'])
+  } catch(e) {
+    res.status(500).json({
+      message: 'Failed to connect to database'
+    })
+  }
+
+  res.status(200).json({
+    message: 'Connected to database'
+  })
+})
+
 app.get('/todos', async (req, res) => {
   const { rows } = await client.query('SELECT * FROM todos')
   res.json(rows)

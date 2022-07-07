@@ -88,6 +88,20 @@ app.use((err, req, res, next) => {
   next(err);
 })
 
+app.get('/healthz', async (req, res) => {
+  try {
+    await axios.get('http://localhost:3001/todos')
+  } catch (error) {
+    res.status(500).json({
+      message: 'Failed to connect to backend application'
+    })
+  }
+
+  res.status(200).json({
+    message: 'Connected to backend application'
+  })
+})
+
 app.listen(port, () => {
   console.log(`Server started in port ${port}`)
 })
