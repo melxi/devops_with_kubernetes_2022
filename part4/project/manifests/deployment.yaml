@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project
+  namespace: project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: project
+    spec:
+      volumes:
+        - name: project-cache
+          persistentVolumeClaim:
+            claimName: project-claim
+      containers:
+      - image: frontend
+        imagePullPolicy: Always
+        name: frontend
+        volumeMounts:
+        - name: project-cache
+          mountPath: /usr/src/app/public/img
+      - image: backend
+        imagePullPolicy: Always
+        name: backend
+        envFrom:
+          - configMapRef:
+              name: project-configmap
+          - secretRef:
+              name: project-password
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: "500m"
+            memory: "1000Mi"
