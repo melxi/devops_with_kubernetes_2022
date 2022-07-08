@@ -3,7 +3,8 @@ kind: Kustomization
 resources:
 - manifests/configmap.yaml
 - manifests/cronjob.yaml
-- manifests/deployment.yaml
+- manifests/rollout.yaml
+- manifests/analysistemplate.yaml
 - manifests/ingress.yaml
 - manifests/persistentvolumeclaim.yaml
 - manifests/postgres-service.yaml
