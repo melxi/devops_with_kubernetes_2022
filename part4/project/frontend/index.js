@@ -27,7 +27,7 @@ const filePath = path.join(dir, "image.jpg")
 let cacheTime
 
 const downloadRandomImage = async (req, res, next) => {
-  if (cacheTime && cacheTime > Date.now() - 24 * 60 * 60 * 1000) {
+  if (cacheTime && cacheTime > Date.now()) {
     return
   }
   
@@ -42,7 +42,7 @@ const downloadRandomImage = async (req, res, next) => {
       }
     )
 
-    cacheTime = Date.now()
+    cacheTime = Date.now() + 24 * 60 * 60 * 1000
 
     return new Promise((resolve, reject) => {
       fs.mkdir(dir, { recursive: true }, (err) => {
@@ -69,7 +69,7 @@ app.get('/', async (req, res) => {
   const todos = response.data
 
   res.render("index", {
-    todos: todos
+    todos
   })
 })
 
