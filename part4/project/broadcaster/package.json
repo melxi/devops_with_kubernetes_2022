@@ -1,5 +1,5 @@
 {
-  "name": "project",
+  "name": "broadcaster",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,11 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
+    "axios": "^0.26.1",
     "express": "^4.17.3",
-    "morgan": "^1.10.0",
-    "nats": "^2.7.1",
-    "pg": "^8.7.3"
+    "nats": "^2.7.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"

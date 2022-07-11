@@ -1,16 +1,20 @@
-const express = require('express')
-const cors = require('cors')
-const { Client } = require('pg')
-const morgan = require('morgan')
-const axios = require('axios')
+import express from 'express'
+import cors from 'cors'
+import pkg from 'pg'
+import { connect, StringCodec } from 'nats'
+import morgan from 'morgan'
+
 const app = express()
 const port = process.env.PORT || 3001
+const { Client } = pkg
+
 const { 
   POSTGRES_DB,
   POSTGRES_HOST,
   POSTGRES_PORT,
   POSTGRES_USER,
-  POSTGRES_PASSWORD
+  POSTGRES_PASSWORD,
+  NATS_URL
 } = process.env
 
 const client = new Client({
@@ -19,7 +23,14 @@ const client = new Client({
   database: POSTGRES_DB,
   password: POSTGRES_PASSWORD,
   port: POSTGRES_PORT
-}) 
+})
+
+const sc = StringCodec()
+const nc = await connect({
+  servers: NATS_URL || 'demo.nats.io:4222'
+})
+
+console.log(`NATS: connected to ${nc.getServer()}`);
 
 app.use(cors())
 app.use(express.json())
@@ -43,6 +54,29 @@ app.get('/healthz', async (req, res) => {
   })
 })
 
+app.post('/broadcast', (req, res) => {
+  const { subject, todo } = req.body
+
+  if (subject.includes('created')) {
+    res.json({
+      user: 'bot',
+      message: 'A todo was created',
+      todo: todo
+    })
+  } else if (subject.includes('updated')) {
+    res.json({
+      user: 'bot',
+      message: 'A todo was updated',
+      todo: todo
+    })
+  } else {
+    res.json({
+      user: 'bot',
+      message: 'No updates'
+    })
+  }
+})
+
 app.get('/todos', async (req, res) => {
   const { rows } = await client.query('SELECT * FROM todos')
 
@@ -57,7 +91,9 @@ app.post('/todos', async (req, res) => {
   } else if (title.length <= 0) {
     res.json({ message: 'Todo is empty' })
   } else {
-    await client.query('INSERT INTO todos (title, completed) VALUES($1, $2);', [title, false])
+    const { rows } = await client.query('INSERT INTO todos (title, completed) VALUES($1, $2);', [title, false])
+
+    nc.publish('todos.created', sc.encode(JSON.stringify(rows[0])))
 
     res.json({ message: 'Todo added' })
   }
@@ -66,7 +102,9 @@ app.post('/todos', async (req, res) => {
 app.put('/todos/:id', async (req, res) => {
   const { id, completed } = req.body
 
-  await client.query('UPDATE todos SET completed=$1 WHERE id=$2;', [completed, id])
+  const { rows } = await client.query('UPDATE todos SET completed=$1 WHERE id=$2;', [completed, id])
+
+  nc.publish('todos.updated', sc.encode(JSON.stringify(rows[0])))
 
   res.json({ message: 'Todo updated' })
 })

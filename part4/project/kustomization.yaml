@@ -3,8 +3,7 @@ kind: Kustomization
 resources:
 - manifests/configmap.yaml
 - manifests/cronjob.yaml
-- manifests/rollout.yaml
-- manifests/analysistemplate.yaml
+- manifests/deployment.yaml
 - manifests/ingress.yaml
 - manifests/persistentvolumeclaim.yaml
 - manifests/postgres-service.yaml
@@ -15,3 +14,5 @@ images:
   newName: melxi/project:frontend
 - name: backend
   newName: melxi/project:backend
+- name: broadcaster
+  newName: melxi/project:broadcaster
