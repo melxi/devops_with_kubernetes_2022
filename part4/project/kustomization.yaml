@@ -10,9 +10,18 @@ resources:
 - manifests/service.yaml
 - manifests/statefulset.yaml
 images:
-- name: frontend
-  newName: melxi/project:frontend
 - name: backend
   newName: melxi/project:backend
+- name: backend:TAG
+  newName: melxi/project
+  newTag: backend-part4-e9c1feb37021dfbea98618f782bb32f277c34699
 - name: broadcaster
   newName: melxi/project:broadcaster
+- name: broadcaster:TAG
+  newName: melxi/project
+  newTag: broadcaster-part4-e9c1feb37021dfbea98618f782bb32f277c34699
+- name: frontend
+  newName: melxi/project:frontend
+- name: frontend:TAG
+  newName: melxi/project
+  newTag: frontend-part4-e9c1feb37021dfbea98618f782bb32f277c34699
