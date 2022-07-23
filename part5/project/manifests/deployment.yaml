@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project
+  namespace: project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: project
+    spec:
+      volumes:
+        - name: project-cache
+          persistentVolumeClaim:
+            claimName: project-claim
+      containers:
+      - image: frontend
+        imagePullPolicy: Always
+        name: frontend
+        volumeMounts:
+        - name: project-cache
+          mountPath: /usr/src/app/public/img
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: "250m"
+            memory: "500Mi"
+        readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            httpGet:
+               path: /healthz
+               port: 3000
+        livenessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          httpGet:
+              path: /healthz
+              port: 3000
+      - image: backend
+        imagePullPolicy: Always
+        name: backend
+        envFrom:
+          - configMapRef:
+              name: project-configmap
+          - secretRef:
+              name: project-password
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: "250m"
+            memory: "500Mi"
+        readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            httpGet:
+               path: /healthz
+               port: 3001
+        livenessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          httpGet:
+              path: /healthz
+              port: 3001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-broadcaster
+  namespace: project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project
+  template:
+    metadata:
+      labels:
+        app: project
+    spec:
+      containers:
+      - image: broadcaster
+        imagePullPolicy: Always
+        name: broadcaster
+        envFrom:
+          - configMapRef:
+              name: project-configmap

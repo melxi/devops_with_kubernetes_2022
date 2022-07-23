@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-output
+  namespace: applications
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-output
+  template:
+    metadata:
+      labels:
+        app: log-output
+    spec:
+      containers:
+      - image: melxi/hashgenerator
+        name: hashgenerator
+        env:
+          - name: GREETING
+            valueFrom:
+              configMapKeyRef:
+                name: greeting-configmap
+                key: greeting
+      - image: melxi/timestamper
+        name: timestamper
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: "250m"
+            memory: "500Mi"
+        readinessProbe:
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          httpGet:
+            path: /healthz
+            port: 3001

@@ -1,0 +1,18 @@
+<div class="todos">
+    <form class="todos-form" action="/" method="POST">
+        <label for="todo"></label>
+        <input type="text" id="todo" name="todo" minlength="1" maxlength="150" />
+        <input type="submit" value="Create TODO" />
+    </form>
+    <ul class="todos-list">
+        <% todos.forEach(todo=> { %>
+            <% let completed = todo.completed ? 'checked' : '' %>
+            <li class="todo-item">
+                <label for="checkbox">
+                    <%= todo.title %>
+                </label>
+                <input type="checkbox" id="todoCheckbox" name="completed" value="<%= todo.id %>" <%=completed%> />
+            </li>
+        <% }) %>
+    </ul>
+</div>
