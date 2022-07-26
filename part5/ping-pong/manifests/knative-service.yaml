@@ -1,0 +1,18 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: pingpong-ksvc
+  namespace: applications
+spec:
+  template:
+    metadata:
+      name: pingpong-ksvc-applications
+    spec:
+      containers:
+        - image: melxi/pingpong
+          name: pingpong
+          envFrom:
+            - configMapRef:
+                name: pingpong-configmap
+            - secretRef:
+                name: pingpong-password
