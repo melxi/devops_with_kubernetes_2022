@@ -1,0 +1,7 @@
+apiVersion: stable.dwk/v1
+kind: Dummysite
+metadata:
+  name: dummysite
+spec:
+  website_url: https://example.com/
+  image: melxi/dummysite:scraper
